@@ -1,0 +1,81 @@
+---
+import { Formatter } from "@utils/formatter";
+import type { GetStaticPaths } from "astro";
+import { Image } from "astro:assets";
+import { getEntry } from "astro:content";
+import { getCollection } from "astro:content";
+import BlogLayout from "src/layouts/BlogLayout.astro";
+
+export const getStaticPaths = (async () => {
+  const blogPost = await getCollection("blog");
+
+  return blogPost.map((post) => ({
+    params: { slug: post.slug },
+    props: { post: post },
+  }));
+}) satisfies GetStaticPaths;
+
+// este post viene de las props de arriba de, la key
+const { post } = Astro.props;
+const frontmatter = post.data;
+
+console.log(post);
+
+const { Content, headings } = await post.render();
+
+const author = (await getEntry("author", post.data.author.id)).data;
+---
+
+<BlogLayout title={frontmatter.title}>
+  <h1 class="text-xs text-gray-500 mb-0">{frontmatter.title}</h1>
+  <!-- <h4 class="text-md text-gray-400 mb-0">{frontmatter.author}</h4> -->
+
+  <div>
+    <Image
+      class="object-cover w-12 h-12 mt-2 rounded-full text-md"
+      src={author.avatar}
+      alt={author.name}
+      width={48}
+      height={48}
+      quality="low"
+      loading="lazy"
+      transition:name={`${post.slug}-avatar`}
+    />
+
+    <div class="flex flex-col">
+      <a href={`/blog/${frontmatter.author.id}`}>{author.name}</a>
+      <span class="text-xs text-gray-200">
+        {Formatter.formatDate(frontmatter.date)}
+      </span>
+    </div>
+  </div>
+
+  <Image
+    class="object-cover w-full h-56 rounded-lg lg:w-64"
+    src={frontmatter.image}
+    alt={frontmatter.title}
+    width={600}
+    height={200}
+    quality="low"
+    loading="lazy"
+    transition:name={`${post.slug}-image`}
+  />
+  <h3>Tabla de contenidos</h3>
+  <!-- tabla de contenidos -->
+  <ol>
+    {
+      headings.map((heading, index) => (
+        <li>
+          <a href={`#${heading.slug}`}>
+            {index + 1} - {heading.text}
+          </a>
+        </li>
+      ))
+    }
+  </ol>
+  <Content />
+
+  <div class="my-20">
+    <a href="#btn-back">Ir arriba</a>
+  </div>
+</BlogLayout>

@@ -1,0 +1,66 @@
+---
+import type { GetStaticPaths } from "astro";
+import { siteConfig } from "src/config/site-config";
+import MainLayout from "../../layouts/MainLayout.astro";
+import { Image } from "astro:assets";
+import TypeBlogPost from "src/components/TypeBlogPost.astro";
+import { getCollection } from "astro:content";
+
+export const getStaticPaths = (async () => {
+  //    const blogPosts = await getCollection("blog");
+  //    const authors = await getCollection("author");
+
+  const [authors, posts] = await Promise.all([
+    getCollection("author"),
+    getCollection("blog"),
+  ]);
+
+  //    const posts = blogPosts.filter((p) => p.data.author.id  == authors);
+  //   recorro authors y filtro los posts que tengan el mismo id
+  return authors.map((a) => ({
+    params: { author: a.id },
+    props: {
+      blogPosts: posts.filter((p) => p.data.author.id == a.id),
+      author: a.data,
+    },
+  }));
+}) satisfies GetStaticPaths;
+
+const { blogPosts, author } = Astro.props;
+---
+
+<MainLayout>
+    <a href="/">Regresar</a>
+  <section class="bg-gray-900">
+    <div class="container px-6 py-10 mx-auto">
+      <h1 class="text-3xl font-semibold capitalize lg:text-4xl text-white">
+        {siteConfig.title}
+      </h1>
+
+      <div class="text-md text-gray-400 mb-0 flex flex-row mt-2">
+        <Image
+          class="rounded-full"
+          src={author.avatar}
+          alt={author.name}
+          width={50}
+          height={50}
+        />
+
+        <div class="flex flex-col ml-5">
+          <a>{author.name}</a>
+          <span>Listado de todos mis posts</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 gap-8 mt-8 md:mt-16 md:grid-cols-2">
+        {blogPosts.map((post) => <TypeBlogPost post={post} />)}
+      </div>
+    </div>
+  </section>
+</MainLayout>
+
+<style is:global>
+  a {
+    @apply text-blue-500 hover:underline;
+  }
+</style>

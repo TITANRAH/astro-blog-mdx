@@ -1,0 +1,212 @@
+npx astro add mdx 
+
+https://docs.astro.build/en/guides/integrations-guide/mdx/
+
+
+https://docs.astro.build/en/guides/markdown-content/
+
+
+temas de astro 
+
+https://astro.build/themes/
+
+colecciones es como una bd en filesystem
+
+https://docs.astro.build/en/guides/content-collections/
+
+
+1. creo los post y los alojo en page posts
+npx astro add mdx 
+
+esto en un archivo mdx es conocido como el frontmatter
+__
+title: ejemplo
+asdajsk: 
+__
+
+# {frontmatter.title} ---sera ejemplo
+
+2. Creo el bloglayout
+
+puedo poner un botoon y se vera en todas las page como por ejem 
+puedo tener varios layout en este caso tendre este pra los blogs y otros para otra cosa
+
+poner un <a href="/" Regresar
+
+3. llamo a blog.css en blog layout y lo guardo en la carpeta styles y estos estilos afectaran directo a los post de md
+tambien puedo modificar por ejem el div principal con sus clases tailwind para que pueda tener un estilo mas los .md
+4.  el index.astro que es nuestra page principal en donde llamamos a bloglayout podemos un html copiado de algun lado como por ejem de https://tailwindcomponents.com/component/grid-blog-page
+
+5. carpeta config/site-config.ts escribimos export const siteConfig = {
+    title: 'My awesome blog',
+    description: 'This is my awesome blog',
+    // siteUrl: 'https://my-awesome-blog.com',
+} y lo colocamos en inde.html es para acortar y crear un componente comun
+
+6. creamos un componente para iterar los blogs
+
+7. puedo llamarlos estaticamente asi pero los llamaremos de otra manera despues const posts = await Astro.glob("./posts/*.{md,mdx}"); aqui digo
+traeme todos los archivos markdown con esas extenciones 
+
+8. llamo a BlogPost itero en el y le paso post 
+
+9. en BlogPost extraigo las props con props = Astro.props o bien destructurar con const {frontmatter, url} = Astro.props 
+
+10. y pinto el url trae el post , y frontmatter.title frmtmatter.image etc segun lo qye tenga elfront matter de los post 
+
+ ahora con COLECCIONES COMO SE HACE REALEMNTE 
+
+1. creola carpeta content en src, no puede llamarse de otra forma, se tiene que llamar content
+
+2. creamos config.ts
+
+3. definir la colecction usando zod , definimos que contiene nuestro esquema, ver config.ts 
+
+4. crear el directorio llamado blog tiene qye ser el mismo nombre que se le puso a la coleccion
+ 
+5. copiamos los posts creados o creamos post nuevos y los alojamos en esta caerpta creada 
+
+6. los llamo en cualquiercomponente asi const blogPost = await getCollection('blog') en este caso en index.astro
+
+7. creo el TypeBlog que servira para iterar los post y renderizar 
+
+8. decimos que recibiremos los blogs asi con esta interface interface Props {
+  post: CollectionEntry<"blog">;
+}
+
+9. y adquirimos las props asi y su data asi const { post } = Astro.props;
+const frontmatter = post.data;
+
+10. y en index.html le pasamos los posts conseguidos con getCollection 
+
+11. creamos en las page la nueva page posts -> [slug].astro 
+
+12. para acceder ponemos en el a <a
+      href={`/posts/${post.slug}`} en el TypeBlog component 
+
+13. si pincho de una que me lleve para la [slug].astro dara error por que necesitamos usar getPathDinamic esto se crea en la misma pagina 
+[slug].astro
+
+14. se crean asi en este caso export const getStaticPaths = (async () => {
+  const blogPost = await getCollection("blog");
+
+  return blogPost.map((post) => ({
+    params: { slug: post.slug },
+    props: { post: post },
+  }));
+}) satisfies GetStaticPaths;
+
+
+// este post viene de las props de arriba
+const { post } = Astro.props;
+
+de aqui tomare la data 
+const frontmatter = post.data;
+
+y de post destructuramos Content y headings que podemos recorrer de cada uno 
+
+<Content/>  es todo el contenido del post
+heading cada titulo de cada post que se pueden enumerar y al hacer click ir hacia esos elementos
+
+y seria esto
+# {frontmatter.title}
+
+  que equivale a title del componente
+
+title: Explorando Funciones de ES6 !!!
+date: 2023-06-01
+description: Explorando algunas de las nuevas funciones de ES6 en JavaScript.
+author: jane-doe
+# image: https://placehold.co/1400x900/
+image: 'images/post-01.png'
+tags: [JavaScript, ES6, Programming]
+
+---
+
+o bien ## Arrow Functions - Funciones de Flecha
+
+
+puedes poner un a href apuntando al a href de arriba mediante id para el boton de regresar arriba 
+
+respecto a las imagenes astro no hace optimizaciones en la carpeta public , solo hace a todo lo que este en la carpeta src 
+
+asi que las imagenes ponerlas en la carpeta blog que esta a su vez dentro de content en el zod puedo hacer convertir a funcion flecha 
+
+destrucutrar y traer el componente imagen() y decir q ue image es de tipo imagen() seguir el zod actual
+
+
+para paginar necesito se usa asi 
+
+const blogPost = await getCollection("blog");
+  // console.log(results);
+  return paginate(blogPost, {
+    pageSize: 2,
+  });
+}) satisfies GetStaticPaths;
+const { page } = Astro.props;
+
+   <a
+      href={page.url.prev}
+      class:list={{
+        disabled: !page.url.prev,
+      }}>Anteriores</a
+    >
+    
+<!--   page .. ?? next   -->
+    <a
+      href={page.url.next}
+      class:list={{
+        disabled: !page.url.next,
+      }}>Siguientes</a
+    >
+
+
+para hacer relaciones usamos reference como en el codigo de zod en config al crear el esquema autor 
+lo relacionamos a cada post
+
+defino al autor como data , los post eran content const authorCollection = defineCollection({
+  type: "data",
+  schema:({image})=> z.object({
+    name: z.string(),
+    avatar: image(),
+    
+  }),
+});
+si imprimo posts en posts [slug].astro veremos author: { id: 'alice-johnson', collection: 'author' },
+
+ahora en cada post asi obtengo la data const author = (await (getEntry("author", post.data.author.id))).data;
+
+la data de cada autor la defini en un archivo .yaml con su nombre
+
+relaciono el campo author del frontmatter con la relacion con author
+
+
+literalmente en cojnfig con zod defino una tabla o coleccion o esquema 
+
+ouedo agregar campos o quitar cuando quiera 
+
+y esos campos tienen realacion directa con el frontmatter de cada entrada en .mdx
+
+
+por ejem necesitraba poder controlaer que entradas s muestran y cuales se esconden 
+agregue la prop isDraft booleana con un false por defecto para que no se cayera el sistema ya 
+qye no etabana agregada eta prop en los frontmatter de las entradas 
+
+entonces en el index donde muetro estas entradas puedo definir en el 
+
+const blogPost = await getCollection('blog', (post) => post.data.isDraft === false)
+
+osea que muetra solo las que estan en false
+
+asi voy a cada front matter y escondo con un true y ya
+---
+title: Explorando Funciones de ES6 !!!
+date: 2023-06-01
+description: Explorando algunas de las nuevas funciones de ES6 en JavaScript.
+author: jane-doe
+# image: https://placehold.co/1400x900/
+image: 'images/post-01.png'
+tags: [JavaScript, ES6, Programming]
+isDraft: false
+
+---

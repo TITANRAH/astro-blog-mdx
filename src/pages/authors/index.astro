@@ -1,0 +1,24 @@
+---
+import { getCollection } from "astro:content";
+import AuthorCard from "src/components/AuthorCard.astro";
+import { siteConfig } from "src/config/site-config";
+import MainLayout from "src/layouts/MainLayout.astro";
+
+const authors = await getCollection("author");
+
+console.log(authors);
+---
+
+<MainLayout title="Listado de autores">
+  <section>
+    <h1
+      class="text-3xl font-semibold text-gray-800 capitalize lg:text-4xl dark:text"
+    >
+      {siteConfig.title}
+    </h1>
+  </section>
+
+  <section class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+    {authors.map((author) => <AuthorCard author={author} />)}
+  </section>
+</MainLayout>
