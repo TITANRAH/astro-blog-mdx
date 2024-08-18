@@ -200,6 +200,8 @@ osea que muetra solo las que estan en false
 
 asi voy a cada front matter y escondo con un true y ya
 ---
+
+
 title: Explorando Funciones de ES6 !!!
 date: 2023-06-01
 description: Explorando algunas de las nuevas funciones de ES6 en JavaScript.
@@ -210,3 +212,12 @@ tags: [JavaScript, ES6, Programming]
 isDraft: false
 
 ---
+
+
+con eto creamos un endpoint
+
+https://docs.astro.build/en/guides/endpoints/#request
+
+
+instalar npm install @astrojs/rss para rssfeed
+https://docs.astro.build/es/guides/rss/

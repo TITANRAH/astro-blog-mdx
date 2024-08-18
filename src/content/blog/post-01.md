@@ -1,5 +1,5 @@
 ---
-title: Explorando Funciones de ES6 !!!
+title: Explorando Funciones de ES6
 date: 2023-06-01
 description: Explorando algunas de las nuevas funciones de ES6 en JavaScript.
 author: jane-doe
@@ -10,7 +10,7 @@ isDraft: false
 
 ---
 
-# {frontmatter.title}
+# Explorando Funciones de ES6
 
 
 
