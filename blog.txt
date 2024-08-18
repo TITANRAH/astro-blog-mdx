@@ -221,3 +221,23 @@ https://docs.astro.build/en/guides/endpoints/#request
 
 instalar npm install @astrojs/rss para rssfeed
 https://docs.astro.build/es/guides/rss/
+
+
+finalmente lo que me da rss es que pueda visibilizarse en aplicaciones como twine rss reader 
+añado el enlace y aparecen los blogs 
+
+debo añadir ademas este link bajo el titile en el mainlayout
+
+ <title>{title}</title>
+
+    <link
+    rel="alternate"
+    type="application/rss+xml"
+    title="Your Site's Title"
+    href={new URL("rss.xml", Astro.site)}
+/>
+
+para mejorar lo que se ve en rss instalamos 
+
+npm i sanitize-html markdown-it
+npm i -D @types/markdown-it @types/sanitize-html
